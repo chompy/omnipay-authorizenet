@@ -4,6 +4,7 @@ namespace Omnipay\AuthorizeNet\Message;
 
 use Omnipay\AuthorizeNet\Model\CardReference;
 use Omnipay\AuthorizeNet\Model\TransactionReference;
+use Omnipay\AuthorizeNet\APICharacterLimitReference;
 use Omnipay\Common\CreditCard;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\AbstractRequest;
@@ -308,24 +309,37 @@ abstract class AIMAbstractRequest extends AbstractRequest
             // A card is present, so include billing and shipping details
             $req->customer->email = $card->getEmail();
 
-            $req->billTo->firstName = $card->getBillingFirstName();
-            $req->billTo->lastName = $card->getBillingLastName();
-            $req->billTo->company = $card->getBillingCompany();
-            $req->billTo->address = trim($card->getBillingAddress1() . " \n" . $card->getBillingAddress2());
-            $req->billTo->city = $card->getBillingCity();
-            $req->billTo->state = $card->getBillingState();
-            $req->billTo->zip = $card->getBillingPostcode();
-            $req->billTo->country = $card->getBillingCountry();
-            $req->billTo->phoneNumber = $card->getBillingPhone();
+            $req->billTo->firstName = substr($card->getBillingFirstName(), 0, 50);
+            $req->billTo->lastName = substr($card->getBillingLastName(), 0, 50);
+            $req->billTo->company = substr($card->getBillingCompany(), 0, 50);
+            $req->billTo->address = substr(
+                trim($card->getBillingAddress1() . " \n" . $card->getBillingAddress2()),
+                0,
+                60
+            );
+            $req->billTo->city = substr($card->getBillingCity(), 0, 40);
+            $req->billTo->state = substr($card->getBillingState(), 0, 40);
+            $req->billTo->zip = substr($card->getBillingPostcode(), 0, 20);
+            $req->billTo->country = substr($card->getBillingCountry(), 0, 60);
+            $req->billTo->phoneNumber = substr($card->getBillingPhone(), 0, 25);
 
-            $req->shipTo->firstName = $card->getShippingFirstName();
-            $req->shipTo->lastName = $card->getShippingLastName();
-            $req->shipTo->company = $card->getShippingCompany();
-            $req->shipTo->address = trim($card->getShippingAddress1() . " \n" . $card->getShippingAddress2());
-            $req->shipTo->city = $card->getShippingCity();
-            $req->shipTo->state = $card->getShippingState();
-            $req->shipTo->zip = $card->getShippingPostcode();
-            $req->shipTo->country = $card->getShippingCountry();
+            APICharacterLimitReference::truncateFields($req->billTo);
+
+            $req->shipTo->firstName = substr($card->getShippingFirstName(), 0, 50);
+            $req->shipTo->lastName = substr($card->getShippingLastName(), 0, 50);
+            $req->shipTo->company = substr($card->getShippingCompany(), 0, 50);
+            $req->shipTo->address = substr(
+                trim($card->getShippingAddress1() . " \n" . $card->getShippingAddress2()),
+                0,
+                60
+            );
+            $req->shipTo->city = substr($card->getShippingCity(), 0, 40);
+            $req->shipTo->state = substr($card->getShippingState(), 0, 40);
+            $req->shipTo->zip = substr($card->getShippingPostcode(), 0, 20);
+            $req->shipTo->country = substr($card->getShippingCountry(), 0, 60);
+
+            APICharacterLimitReference::truncateFields($req->shipTo);
+
         }
 
         return $data;

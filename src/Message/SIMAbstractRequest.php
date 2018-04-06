@@ -2,6 +2,7 @@
 
 namespace Omnipay\AuthorizeNet\Message;
 
+use Omnipay\AuthorizeNet\APICharacterLimitReference;
 use Omnipay\Common\Message\AbstractRequest;
 
 /**
@@ -153,6 +154,9 @@ abstract class SIMAbstractRequest extends AbstractRequest
             $data['x_ship_to_state'] = $card->getShippingState();
             $data['x_ship_to_zip'] = $card->getShippingPostcode();
             $data['x_ship_to_country'] = $card->getShippingCountry();
+
+            APICharacterLimitReference::truncateFields($data);
+
         }
 
         return $data;

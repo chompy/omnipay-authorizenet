@@ -2,6 +2,7 @@
 
 namespace Omnipay\AuthorizeNet\Message;
 
+use Omnipay\AuthorizeNet\APICharacterLimitReference;
 use Omnipay\Common\CreditCard;
 
 /**
@@ -75,7 +76,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
         if ($card = $this->getCard()) {
             $req = $data->addChild('billTo');
             // A card is present, so include billing details
-            $req->firstName = $card->getBillingFirstName();
+            $req->firstName = substr($card->getBillingFirstName(), 0, 50);
             $req->lastName = $card->getBillingLastName();
             $req->company = $card->getBillingCompany();
             $req->address = trim($card->getBillingAddress1() . " \n" . $card->getBillingAddress2());
@@ -95,6 +96,8 @@ class CIMCreateCardRequest extends CIMAbstractRequest
                     }
                 }
             }
+
+            APICharacterLimitReference::truncateFields($req);
 
             $req = $data->addChild('payment');
             $req->creditCard->cardNumber = $card->getNumber();
@@ -140,6 +143,7 @@ class CIMCreateCardRequest extends CIMAbstractRequest
             if ($card->getShippingCountry()) {
                 $data->shipToList->country = $card->getShippingCountry();
             }
+            APICharacterLimitReference::truncateFields($data->shipToList);
         }
     }
 
